@@ -1,5 +1,5 @@
 import { UnityProvider } from './context/UnityContext'
-import { UnityWrapper } from './components/UnityWrapper'
+import { UnityWrapper } from './bridge/UnityWrapper'
 
 function App() {
   return (

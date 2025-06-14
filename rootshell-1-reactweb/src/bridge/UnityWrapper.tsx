@@ -3,7 +3,14 @@ import React, { useEffect, useRef, useState } from 'react'
 import { UnityCanvas } from './UnityCanvas'
 import { useUnity } from '../context/UnityContext'
 import { unityMessageHandlers } from './UnityMessageHandler'
+import { handleUnityMessage } from './UnityMessageHandler'
 
+
+declare global {
+  interface Window {
+    onUnityMessage?: (message: string) => void;
+  }
+}
 
 export const UnityWrapper: React.FC = () => {
   const { unityInstanceRef, handshakeDone, unityMessageQueueRef } = useUnity()
@@ -61,6 +68,16 @@ export const UnityWrapper: React.FC = () => {
       //setTimeout(() => setShowSplash(false), 500)
     }
   }, [reactReady, unityReady])
+
+  //
+  useEffect(() => {
+    window.onUnityMessage = handleUnityMessage;
+    console.log("✅ window.onUnityMessage 등록됨");
+
+    return () => {
+      delete window.onUnityMessage;
+    };
+  }, []);
 
 
   // Unity 인스턴스 생성
