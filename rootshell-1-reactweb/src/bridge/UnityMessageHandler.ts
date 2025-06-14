@@ -17,11 +17,6 @@ type UnityWriteJsonMessage = {
   data: any;
 };
 
-type UnityMessagePayload = {
-  type: string;
-  payload: any;
-  id?: number;
-};
 
 type UnityMessageHandler = (payload: any, id?: number) => void;
 
@@ -30,12 +25,11 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
     console.log(`[Unity] writeJson 요청 수신`, payload);
 
     // 파일 저장
-    /*
     saveSystemFile({
       folder: '',
       filename: payload.file,
       data: payload.data,
-    });*/
+    });
 
     // 응답 보내기
     if (typeof id !== 'undefined' && window.unityInstance) {
@@ -55,18 +49,16 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
 // Unity에서 호출하는 메시지 핸들러
 export function handleUnityMessage(raw: string) {
   try {
-    const msg = JSON.parse(raw) as UnityMessagePayload;
+    //console.log("📩 Unity 원본 메시지:", raw);
+    const msg = JSON.parse(raw);
 
-    if (!msg || typeof msg !== 'object') {
-      throw new Error("Invalid Unity message");
-    }
+    const { type, id, ...payload } = msg;
 
-    const handler = unityMessageHandlers[msg.type];
-
+    const handler = unityMessageHandlers[type];
     if (handler) {
-      handler(msg.payload, msg.id);
+      handler(payload, id); // payload가 실제 writeJson 전체 구조
     } else {
-      console.warn(`⚠️ 정의되지 않은 메시지 타입: ${msg.type}`);
+      console.warn(`⚠️ 정의되지 않은 메시지 타입: ${type}`);
     }
   } catch (e) {
     console.error("❌ Unity 메시지 처리 실패:", e);
