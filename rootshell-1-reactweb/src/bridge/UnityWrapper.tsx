@@ -5,6 +5,7 @@ import { useUnity } from '../context/UnityContext'
 import { unityMessageHandlers } from './UnityMessageHandler'
 import { handleUnityMessage } from './UnityMessageHandler'
 
+import { log, logError, logSuccess, logWarn } from '../utils/log';
 
 declare global {
   interface Window {
@@ -33,10 +34,10 @@ export const UnityWrapper: React.FC = () => {
             try {
                 handler(parsed.payload);
             } catch (e) {
-                console.error(`❌ 메시지 처리 오류: ${parsed.type}`, e);
+                logError(`메시지 처리 오류: ${parsed.type} ${e}`);
             }
             } else {
-            console.warn(`⚠️ 알 수 없는 메시지 타입: ${parsed.type}`);
+            logWarn(`알 수 없는 메시지 타입: ${parsed.type}`);
             }
         }
       }
@@ -48,7 +49,7 @@ export const UnityWrapper: React.FC = () => {
   // Unity에서 준비 완료 시 호출될 전역 함수 등록
   useEffect(() => {
     (window as any).onUnityReady = () => {
-      console.log('🟢 Unity → React 준비 완료 수신')
+      logSuccess('Unity → React 준비 완료 수신')
       setShowSplash(false)
       setUnityReady(true)
     }
@@ -62,7 +63,7 @@ export const UnityWrapper: React.FC = () => {
       const tempUniqueID = '111';
       //
 
-      console.log('🤝 핸드셰이크 성공! SendMessage 전송');
+      logSuccess('핸드셰이크 성공! SendMessage 전송');
       handshakeDone.current = true
       unityInstanceRef.current?.SendMessage('RootShellBridge', 'OnReactReady', tempUniqueID)
       //setTimeout(() => setShowSplash(false), 500)
@@ -72,7 +73,7 @@ export const UnityWrapper: React.FC = () => {
   //
   useEffect(() => {
     window.onUnityMessage = handleUnityMessage;
-    console.log("✅ window.onUnityMessage 등록됨");
+    logSuccess("window.onUnityMessage 등록됨");
 
     return () => {
       delete window.onUnityMessage;
@@ -109,7 +110,7 @@ export const UnityWrapper: React.FC = () => {
           }, 30)
         }
       }).then((instance: any) => {
-        console.log("✅ Unity 인스턴스 생성 완료");
+        logSuccess("Unity 인스턴스 생성 완료");
         (window as any).unityInstance = instance
         setProgress(1)
         setFadeOut(true);
@@ -126,7 +127,7 @@ export const UnityWrapper: React.FC = () => {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (handshakeDone.current && unityInstanceRef.current) {
-        console.log("👋 종료 메시지 전송 중...");
+        log("종료 메시지 전송 중...");
         unityInstanceRef.current.SendMessage('Bootstrap', 'OnReactClose', 'end-mq');
       }
     }

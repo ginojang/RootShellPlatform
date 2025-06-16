@@ -1,3 +1,7 @@
+
+import { log, logError, logSuccess, logWarn } from '../utils/log';
+
+
 export type StoragePayload = {
   folder?: string;      // 저장 경로처럼 쓸 prefix
   filename: string;     // 저장 파일명
@@ -20,17 +24,16 @@ export function saveToLocal({ folder, filename, data }: StoragePayload): void {
     const json = JSON.stringify(data, null, 2);
     const fullName = folder ? `${folder}_${filename}` : filename;
 
-    console.log(`💾 저장 시도: ${fullName}`);
-    console.log(`📄 저장 내용:`, json);
+    log(` 💾 저장 시도: ${fullName}`);
 
     // 실제 저장
     localStorage.setItem(fullName, json);
 
     // 저장 후 확인
     const verify = localStorage.getItem(fullName);
-    console.log(`✅ 저장 확인: ${fullName} =`, verify);
+    log(` ✅ 저장 확인: ${fullName} = ${verify}`);
   } catch (err) {
-    console.error("❌ JSON 저장 실패:", err);
+    logError(` JSON 저장 실패: ${err}`);
   }
 }
 
@@ -59,17 +62,16 @@ export function loadFromLocal({ folder, filename }: { folder?: string; filename:
 
     const fullName = folder ? `${folder}_${filename}` : filename;
     const json = localStorage.getItem(fullName);
-
-    console.log(`📥 읽기 시도: ${fullName}`);
+    
     if (json) {
-      console.log(`📤 로드 완료: ${fullName}  ${json}`);
+      log(` 📤 로드 완료: ${fullName}`);
       return json;
     } else {
-      console.warn(`⚠️ 파일 없음 또는 값 없음: ${fullName}`);
+      logWarn(`파일 없음 또는 값 없음: ${fullName}`);
       return null;
     }
   } catch (err) {
-    console.error("❌ JSON 로드 실패:", err);
+    logError(`JSON 로드 실패: ${err}`);
     return null;
   }
 }
@@ -78,9 +80,9 @@ export function loadFromLocal({ folder, filename }: { folder?: string; filename:
 export function deleteAllLocalStorage(): void {
   try {
     localStorage.clear();
-    console.log("🧨 모든 localStorage 삭제 완료");
+    logSuccess("모든 localStorage 삭제 완료");
   } catch (err) {
-    console.error("❌ 전체 삭제 실패:", err);
+    logError(`전체 삭제 실패: ${err}`);
   }
 }
 

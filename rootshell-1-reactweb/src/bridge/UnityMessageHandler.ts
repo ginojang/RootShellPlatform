@@ -1,5 +1,5 @@
 import { saveToLocal, loadFromLocal  } from '../services/StorageService';
-
+import { log, logError, logSuccess, logWarn } from '../utils/log';
 
 declare global {
   interface Window {
@@ -25,7 +25,7 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
 
   //
   writeJson: (payload: UnityWriteJsonMessage, id?: number) => {
-    console.log(`[Unity] writeJson 요청 수신`, payload);
+    log(`Unity writeJson 요청 수신 - msg count id: ${id}`);
 
     // 파일 저장
     saveToLocal({
@@ -46,7 +46,7 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
 
   //
   readJson: (payload, id) => {
-    console.log(`[Unity] readJson 요청 수신`, payload)
+    log(`Unity readJson 요청 수신 - msg count id: ${id}`)
 
     const resultData = loadFromLocal({
       folder: '',
@@ -68,7 +68,6 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
 // Unity에서 호출하는 메시지 핸들러
 export function handleUnityMessage(raw: string) {
   try {
-    //console.log("📩 Unity 원본 메시지:", raw);
     const msg = JSON.parse(raw);
 
     const { type, id, ...payload } = msg;
@@ -77,9 +76,9 @@ export function handleUnityMessage(raw: string) {
     if (handler) {
       handler(payload, id); // payload가 실제 writeJson 전체 구조
     } else {
-      console.warn(`⚠️ 정의되지 않은 메시지 타입: ${type}`);
+      logWarn(`정의되지 않은 메시지 타입: ${type}`);
     }
   } catch (e) {
-    console.error("❌ Unity 메시지 처리 실패:", e);
+    logError(`Unity 메시지 처리 실패: ${e}`);
   }
 }

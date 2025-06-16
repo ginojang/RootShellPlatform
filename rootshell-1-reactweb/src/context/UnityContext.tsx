@@ -1,5 +1,7 @@
 // UnityContext.tsx
 import React, { createContext, useContext, useRef } from 'react'
+import { log} from '../utils/log';
+
 
 export const UnityContext = createContext<{
     unityInstanceRef: React.MutableRefObject<any>;
@@ -19,7 +21,7 @@ export const UnityProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // 🧠 메시지 수신 핸들러 등록 (최초 1회)
     if (typeof window !== 'undefined') {
         (window as any).onRecvUnityMessge = (msg: string) => {
-            console.log("📨 Unity → React 메시지 수신:", msg);
+            log(`  📨 Unity → React 메시지 수신: ${msg}`);
             unityMessageQueueRef.current.push(msg);
         };
     }
