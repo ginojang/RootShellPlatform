@@ -1,5 +1,5 @@
-import { saveSystemFile } from '../utils/saveSystem';
-import type { SaveSystemPayload } from '../utils/saveSystem';
+import { saveToLocal, loadFromLocal  } from '../services/StorageService';
+
 
 declare global {
   interface Window {
@@ -21,11 +21,14 @@ type UnityWriteJsonMessage = {
 type UnityMessageHandler = (payload: any, id?: number) => void;
 
 export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
+
+
+  //
   writeJson: (payload: UnityWriteJsonMessage, id?: number) => {
     console.log(`[Unity] writeJson 요청 수신`, payload);
 
     // 파일 저장
-    saveSystemFile({
+    saveToLocal({
       folder: '',
       filename: payload.file,
       data: payload.data,
@@ -41,9 +44,25 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
     }
   },
 
-  save_system: (payload: SaveSystemPayload) => {
-    saveSystemFile(payload);
+  //
+  readJson: (payload, id) => {
+    console.log(`[Unity] readJson 요청 수신`, payload)
+
+    const resultData = loadFromLocal({
+      folder: '',
+      filename: payload.file,
+    })
+
+    if (typeof id !== 'undefined' && window.unityInstance) {
+      window.unityInstance.SendMessage(
+        'RootShellBridge',
+        'OnJsonReadAck',
+        JSON.stringify({ id, data: resultData ?? 'error' })
+      )
+    }
   },
+
+
 };
 
 // Unity에서 호출하는 메시지 핸들러
