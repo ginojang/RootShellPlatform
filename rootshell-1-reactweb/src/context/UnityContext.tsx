@@ -18,6 +18,8 @@ export const UnityProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const handshakeDone = useRef(false)
     const unityMessageQueueRef = useRef<string[]>([]);
 
+    window.dictMessageCallbacks = {};
+    
     // 🧠 메시지 수신 핸들러 등록 (최초 1회)
     if (typeof window !== 'undefined') {
         (window as any).onRecvUnityMessge = (msg: string) => {

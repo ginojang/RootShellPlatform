@@ -1,13 +1,6 @@
 import { saveToLocal, loadFromLocal  } from '../services/StorageService';
 import { log, logError, logSuccess, logWarn } from '../utils/log';
 
-declare global {
-  interface Window {
-    unityInstance?: {
-      SendMessage: (gameObject: string, methodName: string, parameter: string) => void;
-    };
-  }
-}
 
 // 공통 필드 정의
 type UnityJsonMessageBase = {
@@ -53,7 +46,7 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
           'RootShellBridge',
           'OnJsonWriteAck',
           JSON.stringify({ id, result: true }))
-        }, 500);    
+        }, 1000);    
     }
   },
 
@@ -73,12 +66,14 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
           'RootShellBridge',
           'OnJsonReadAck',
           JSON.stringify({ id, data: resultData ?? 'error' })) 
-        }, 500);
+        }, 1000);
     }
   },
 };
 
 
+
+/*
 // Unity에서 호출하는 메시지 핸들러
 export function handleUnityMessage(raw: string) {
   try {
@@ -100,4 +95,55 @@ export function handleUnityMessage(raw: string) {
 
     
   }
+}
+*/
+
+export async function handleUnityMessage(raw: string) {
+  try {
+    log(`handleUnityMessage : 수신 메시지 내용: ${raw}`);
+    const msg = JSON.parse(raw);
+    const { type, id, ...rest } = msg;
+
+    // 1️⃣ 콜백 등록까지 대기 (최대 1초)
+    //await waitForCallbackRegistration(id, 1000);  // 1초까지 기다림
+
+    // 2️⃣ data 문자열이면 JSON으로 파싱
+    let payload: any = { ...rest };
+    if (typeof payload.data === 'string') {
+      try {
+        payload.data = JSON.parse(payload.data);
+        log(`data 문자열 → 객체 파싱 성공`);
+      } catch {
+        logWarn(`data 필드 이중 파싱 실패`);
+      }
+    }
+
+    // 3️⃣ 핸들러 호출
+    const handler = unityMessageHandlers[type];
+    if (handler) {
+      handler(payload, id);
+    } else {
+      logWarn(`정의되지 않은 메시지 타입: ${type}`);
+    }
+  } catch (e) {
+    logError(`handleUnityMessage 오류: ${e}`);
+  }
+}
+
+function waitForCallbackRegistration(id: number, timeout = 1000): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      clearInterval(interval);
+      logWarn(`[TS] 콜백 등록 지연됨: id=${id}`);
+      resolve();  // 초과 시에도 일단 넘기면서 로그 남김
+    }, timeout);
+
+    const interval = setInterval(() => {
+      if (window.dictMessageCallbacks?.[id]) {
+        clearTimeout(timer);
+        clearInterval(interval);
+        resolve();
+      }
+    }, 20);
+  });
 }
