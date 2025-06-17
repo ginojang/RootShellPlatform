@@ -9,12 +9,23 @@ declare global {
   }
 }
 
-// 메시지 타입 정의
-type UnityWriteJsonMessage = {
+// 공통 필드 정의
+type UnityJsonMessageBase = {
   id: number;
-  type: 'writeJson';
+  type: 'readJson' | 'writeJson';
   file: string;
-  data: any;
+};
+
+// Write 전용
+export type UnityWriteJsonMessage = UnityJsonMessageBase & {
+  type: 'writeJson';
+  data: any;  // write만 data 필요
+};
+
+// Read 전용
+export type UnityReadJsonMessage = UnityJsonMessageBase & {
+  type: 'readJson';
+  // 읽기는 data 필요 없음
 };
 
 
@@ -29,48 +40,54 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
 
     // 파일 저장
     saveToLocal({
-      folder: '',
+      folder: 'userdata',
       filename: payload.file,
       data: payload.data,
     });
 
     // 응답 보내기
     if (typeof id !== 'undefined' && window.unityInstance) {
-      window.unityInstance.SendMessage(
-        'RootShellBridge',
-        'OnJsonWriteAck',
-        JSON.stringify({ id, result: true })
-      );
+
+      setTimeout(() => {
+        window.unityInstance?.SendMessage(
+          'RootShellBridge',
+          'OnJsonWriteAck',
+          JSON.stringify({ id, result: true }))
+        }, 500);    
     }
   },
 
   //
-  readJson: (payload, id) => {
+  readJson: (payload: UnityReadJsonMessage, id) => {
     log(`Unity readJson 요청 수신 - msg count id: ${id}`)
 
     const resultData = loadFromLocal({
-      folder: '',
+      folder: 'userdata',
       filename: payload.file,
     })
 
     if (typeof id !== 'undefined' && window.unityInstance) {
-      window.unityInstance.SendMessage(
-        'RootShellBridge',
-        'OnJsonReadAck',
-        JSON.stringify({ id, data: resultData ?? 'error' })
-      )
+
+      setTimeout(() => {
+        window.unityInstance?.SendMessage(
+          'RootShellBridge',
+          'OnJsonReadAck',
+          JSON.stringify({ id, data: resultData ?? 'error' })) 
+        }, 500);
     }
   },
-
-
 };
+
 
 // Unity에서 호출하는 메시지 핸들러
 export function handleUnityMessage(raw: string) {
   try {
-    const msg = JSON.parse(raw);
+    log(`handleUnityMessage : 수신 메시지 내용: ${raw}`)
 
+    const msg = JSON.parse(raw);
     const { type, id, ...payload } = msg;
+
+    log(`handleUnityMessage : 파싱된 메시지: ${msg.type}  ${msg.id}  ${msg.data}`)
 
     const handler = unityMessageHandlers[type];
     if (handler) {
@@ -79,6 +96,8 @@ export function handleUnityMessage(raw: string) {
       logWarn(`정의되지 않은 메시지 타입: ${type}`);
     }
   } catch (e) {
-    logError(`Unity 메시지 처리 실패: ${e}`);
+    logError(`>>>>  handleUnityMessage  >>>> Unity 메시지 처리 실패: ${e}`);
+
+    
   }
 }

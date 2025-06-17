@@ -9,22 +9,14 @@ export type StoragePayload = {
 };
 
 export function saveToLocal({ folder, filename, data }: StoragePayload): void {
-  /*
+  
   try {
-    const fullName = folder ? `${folder}_${filename}` : filename;
-    const json = JSON.stringify(data);
-    localStorage.setItem(fullName, json);
-
-    console.log(`💾 파일저장 성공 : ${fullName} - ${json}`);
-  } catch (err) {
-    console.error("❌ JSON 저장 실패:", err);
-  }
-    */
-   try {
     const json = JSON.stringify(data, null, 2);
     const fullName = folder ? `${folder}_${filename}` : filename;
 
     log(` 💾 저장 시도: ${fullName}`);
+
+    log(` ✅✅✅${json}`);
 
     // 실제 저장
     localStorage.setItem(fullName, json);
@@ -38,27 +30,10 @@ export function saveToLocal({ folder, filename, data }: StoragePayload): void {
 }
 
 export function loadFromLocal({ folder, filename }: { folder?: string; filename: string }): string | null {
-  /*
+
   try {
-    console.log(Object.keys(localStorage))  // 저장된 키 전체 보기
 
-    const fullName = folder ? `${folder}_${filename}` : filename
-    const json = localStorage.getItem(fullName)
-    if (json) {
-      console.log(`📤 로드 완료: ${fullName}  ${json}`)
-      return json
-    } else {
-      console.warn(`⚠️ 파일 없음: ${fullName}`)
-      return null
-    }
-  } catch (err) {
-    console.error("❌ JSON 로드 실패:", err)
-    return null
-  }*/
- 
- try {
-
-  //deleteAllLocalStorage();
+    deleteAllLocalStorage();
 
     const fullName = folder ? `${folder}_${filename}` : filename;
     const json = localStorage.getItem(fullName);
