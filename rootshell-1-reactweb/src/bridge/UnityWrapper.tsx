@@ -46,14 +46,22 @@ export const UnityWrapper: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+
   // Unity에서 준비 완료 시 호출될 전역 함수 등록
+  
+  const unityReadyCallCountRef = useRef(0)
+
   useEffect(() => {
     (window as any).onUnityReady = () => {
-      logSuccess('Unity → React 준비 완료 수신')
+      unityReadyCallCountRef.current += 1
+
+      logSuccess(`Unity → React 준비 완료 수신  (count: ${unityReadyCallCountRef.current})`)
       setShowSplash(false)
       setUnityReady(true)
     }
   }, [])
+
+  
 
   // 핸드셰이크 조건이 모두 충족되었는지 체크 후 전송
   useEffect(() => {
@@ -71,6 +79,7 @@ export const UnityWrapper: React.FC = () => {
   }, [reactReady, unityReady])
 
   //
+  /*
   useEffect(() => {
     window.onUnityMessage = handleUnityMessage;
     logSuccess("window.onUnityMessage 등록됨");
@@ -78,7 +87,24 @@ export const UnityWrapper: React.FC = () => {
     return () => {
       delete window.onUnityMessage;
     };
-  }, []);
+  }, []);*/
+  let isUnityMessageRegistered = false;
+
+useEffect(() => {
+  if (!isUnityMessageRegistered) {
+    window.onUnityMessage = handleUnityMessage;
+    isUnityMessageRegistered = true;
+    logSuccess("✅ window.onUnityMessage 최초 등록 완료");
+  } else {
+    logWarn("⚠️ 이미 onUnityMessage가 등록되어 있음. 재등록 방지됨.");
+  }
+
+  return () => {
+    delete window.onUnityMessage;
+    isUnityMessageRegistered = false;
+    logWarn("❌ window.onUnityMessage 해제됨");
+  };
+}, []);
 
 
   // Unity 인스턴스 생성

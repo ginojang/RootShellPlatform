@@ -98,11 +98,20 @@ export function handleUnityMessage(raw: string) {
 }
 */
 
+const handledMessageIds = new Set<number>();
+
 export async function handleUnityMessage(raw: string) {
   try {
     log(`handleUnityMessage : 수신 메시지 내용: ${raw}`);
     const msg = JSON.parse(raw);
     const { type, id, ...rest } = msg;
+  
+    if (handledMessageIds.has(msg.id)) {
+      logWarn(`⚠️ 중복 메시지 ID: ${msg.id} → 무시`);
+      return;
+    }
+
+    handledMessageIds.add(msg.id);
 
     // 1️⃣ 콜백 등록까지 대기 (최대 1초)
     //await waitForCallbackRegistration(id, 1000);  // 1초까지 기다림
