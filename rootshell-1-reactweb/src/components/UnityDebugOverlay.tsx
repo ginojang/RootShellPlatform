@@ -6,7 +6,7 @@ interface LogEntry {
   message: string;
 }
 
-const isDebugUIEnabled = true;
+const isDebugUIEnabled = false;
 const debugOverlayVersion = '1000'; // 버전 하드코딩
 
 export default function UnityDebugOverlay() {
@@ -46,8 +46,8 @@ export default function UnityDebugOverlay() {
         onClick={() => setVisible(!visible)}
         style={{
           position: 'fixed',
-          top: 10,
-          left: '50%',
+          top: '54%',
+          left: '10%',
           transform: 'translateX(-50%)',
           background: '#222',
           color: 'white',
@@ -65,7 +65,7 @@ export default function UnityDebugOverlay() {
       <div
         style={{
           position: 'fixed',
-          top: 10,
+          bottom: 10,
           right: 10,
           background: 'rgba(0,0,0,0.7)',
           color: 'white',

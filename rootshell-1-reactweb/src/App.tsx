@@ -6,10 +6,47 @@ import { UnityWrapper } from './bridge/UnityWrapper'
 import UnityDebugOverlay from './components/UnityDebugOverlay'
 import KaiaLoginView from './pages/KaiaLoginView'
 
+import TopLeftMenuButton from './components/TopLeftMenuButton'
+import MaintenancePage from './pages/MaintenancePage'
+
+import WalletStatusBar from './components/WalletStatusBar'
+
+// 🔥 추가
+import { PaymentProvider/*, usePayment*/ } from './context/PaymentContext'
+
+/*
+function PaymentButton() {
+  const { isPaying, paymentStatus, startPayment } = usePayment()
+
+  return (
+    <div style={{ marginTop: '20px' }}>
+      <button
+        onClick={startPayment}
+        disabled={isPaying}
+        style={{
+          padding: '12px 20px',
+          fontSize: '16px',
+          borderRadius: '8px',
+          backgroundColor: '#00c7a7',
+          color: 'white',
+          border: 'none',
+          cursor: isPaying ? 'not-allowed' : 'pointer',
+        }}
+      >
+        {paymentStatus === 'idle' && '💳 결제 시작'}
+        {paymentStatus === 'started' && '⏳ 결제 중...'}
+        {paymentStatus === 'completed' && '✅ 결제 완료'}
+      </button>
+    </div>
+  )
+}*/
+
 function AppInner() {
   const { isConnected } = useKaiaWallet()
   const [showUnity, setShowUnity] = useState(false)
+  const [showMaintenance, setShowMaintenance] = useState(false)
 
+  const toggleMaintenance = () => setShowMaintenance(prev => !prev)
   const handleUnityStart = () => setShowUnity(true)
 
   useEffect(() => {
@@ -21,10 +58,19 @@ function AppInner() {
   return (
     <UnityProvider>
       <UnityDebugOverlay />
-      {isConnected && showUnity ? (
+      <WalletStatusBar /> {/* 💰 상단 상태 표시 */}
+      <TopLeftMenuButton onClick={toggleMaintenance} />
+
+      {showMaintenance ? (
+        <MaintenancePage />
+      ) : isConnected && showUnity ? (
         <UnityWrapper />
       ) : (
-        <KaiaLoginView onStartUnity={handleUnityStart} />
+        <>
+          <KaiaLoginView onStartUnity={handleUnityStart} />
+          {/*<PaymentButton /> */
+          }
+        </>
       )}
     </UnityProvider>
   )
@@ -33,7 +79,9 @@ function AppInner() {
 export default function App() {
   return (
     <KaiaWalletProvider>
-      <AppInner />
+      <PaymentProvider>
+        <AppInner />
+      </PaymentProvider>
     </KaiaWalletProvider>
   )
 }

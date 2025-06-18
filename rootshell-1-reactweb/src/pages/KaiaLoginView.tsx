@@ -1,5 +1,9 @@
 // src/pages/KaiaLoginView.tsx
+import toast from 'react-hot-toast'
 import { useKaiaWallet } from '../context/KaiaContext'
+import { usePayment } from '../context/PaymentContext'
+import { useEffect } from 'react'
+
 
 type Props = {
   onStartUnity: () => void
@@ -7,6 +11,19 @@ type Props = {
 
 export default function KaiaLoginView({ onStartUnity }: Props) {
   const { connect, isConnected, address } = useKaiaWallet()
+
+  const { paymentStatus } = usePayment()
+  const { refreshBalance } = useKaiaWallet()
+
+    useEffect(() => {
+    if (paymentStatus === 'completed') {
+    const amount = 100  // 💰 실제 결제 금액 (Mock)
+
+    toast.success(`₩${amount.toLocaleString()} 결제가 완료되었습니다.`)
+    refreshBalance()
+    }
+    }, [paymentStatus])
+
 
   return (
     <main style={{ color: '#fff', textAlign: 'center', marginTop: '4rem' }}>
@@ -44,7 +61,7 @@ export default function KaiaLoginView({ onStartUnity }: Props) {
               cursor: 'pointer',
             }}
           >
-            ▶️ Unity 시작하기
+            ▶️ 오투잼 프루츠 시작 
           </button>
         </>
       )}
