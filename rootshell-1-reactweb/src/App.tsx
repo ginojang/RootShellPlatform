@@ -14,6 +14,8 @@ import WalletStatusBar from './components/WalletStatusBar'
 // 🔥 추가
 import { PaymentProvider/*, usePayment*/ } from './context/PaymentContext'
 
+import AStartSplash from './pages/AStartSplash'
+
 /*
 function PaymentButton() {
   const { isPaying, paymentStatus, startPayment } = usePayment()
@@ -41,6 +43,7 @@ function PaymentButton() {
   )
 }*/
 
+
 function AppInner() {
   const { isConnected } = useKaiaWallet()
   const [showUnity, setShowUnity] = useState(false)
@@ -58,7 +61,7 @@ function AppInner() {
   return (
     <UnityProvider>
       <UnityDebugOverlay />
-      <WalletStatusBar /> {/* 💰 상단 상태 표시 */}
+      <WalletStatusBar /> {}
       <TopLeftMenuButton onClick={toggleMaintenance} />
 
       {showMaintenance ? (
@@ -67,8 +70,10 @@ function AppInner() {
         <UnityWrapper />
       ) : (
         <>
-          <KaiaLoginView onStartUnity={handleUnityStart} />
-          {/*<PaymentButton /> */
+          {/*<KaiaLoginView onStartUnity={handleUnityStart} />*/  
+          }
+          {
+            <AStartSplash/>
           }
         </>
       )}
