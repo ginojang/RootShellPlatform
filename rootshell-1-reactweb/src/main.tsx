@@ -2,6 +2,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
+import { KaiaWalletProvider } from './context/KaiaContext'
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
@@ -39,6 +40,8 @@ document.head.appendChild(globalStyle)
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
+    <KaiaWalletProvider>
     <App />
+    </KaiaWalletProvider>
   </React.StrictMode>,
 )
