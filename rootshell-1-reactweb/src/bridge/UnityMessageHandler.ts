@@ -1,5 +1,5 @@
 import { saveToLocal, loadFromLocal  } from '../services/StorageService';
-import { log, logError, logSuccess, logWarn } from '../utils/log';
+import { log, logError,  logWarn } from '../utils/log';
 
 
 // 공통 필드 정의
@@ -139,6 +139,7 @@ export async function handleUnityMessage(raw: string) {
   }
 }
 
+/*
 function waitForCallbackRegistration(id: number, timeout = 1000): Promise<void> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -155,4 +156,4 @@ function waitForCallbackRegistration(id: number, timeout = 1000): Promise<void> 
       }
     }, 20);
   });
-}
+}*/
