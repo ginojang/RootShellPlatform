@@ -46,7 +46,7 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
           'RootShellBridge',
           'OnJsonWriteAck',
           JSON.stringify({ id, result: true }))
-        }, 1000);    
+        }, 100);    
     }
   },
 
@@ -66,7 +66,7 @@ export const unityMessageHandlers: Record<string, UnityMessageHandler> = {
           'RootShellBridge',
           'OnJsonReadAck',
           JSON.stringify({ id, data: resultData ?? 'error' })) 
-        }, 1000);
+        }, 100);
     }
   },
 };
