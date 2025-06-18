@@ -15,8 +15,7 @@ export function saveToLocal({ folder, filename, data }: StoragePayload): void {
     const fullName = folder ? `${folder}_${filename}` : filename;
 
     log(` 💾 저장 시도: ${fullName}`);
-
-    log(` ✅✅✅${json}`);
+    //log(` ✅✅✅${json}`);
 
     // 실제 저장
     localStorage.setItem(fullName, json);
@@ -33,7 +32,7 @@ export function loadFromLocal({ folder, filename }: { folder?: string; filename:
 
   try {
 
-    deleteAllLocalStorage();
+    //deleteAllLocalStorage();
 
     const fullName = folder ? `${folder}_${filename}` : filename;
     const json = localStorage.getItem(fullName);

@@ -102,7 +102,7 @@ const handledMessageIds = new Set<number>();
 
 export async function handleUnityMessage(raw: string) {
   try {
-    log(`handleUnityMessage : 수신 메시지 내용: ${raw}`);
+    //log(`handleUnityMessage : 수신 메시지 내용: ${raw}`);
     const msg = JSON.parse(raw);
     const { type, id, ...rest } = msg;
   
