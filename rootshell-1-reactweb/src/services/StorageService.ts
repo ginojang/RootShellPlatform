@@ -21,8 +21,8 @@ export function saveToLocal({ folder, filename, data }: StoragePayload): void {
     localStorage.setItem(fullName, json);
 
     // 저장 후 확인
-    const verify = localStorage.getItem(fullName);
-    log(` ✅ 저장 확인: ${fullName} = ${verify}`);
+    //const verify = localStorage.getItem(fullName);
+    //log(` ✅ 저장 확인: ${fullName} = ${verify}`);
   } catch (err) {
     logError(` JSON 저장 실패: ${err}`);
   }
