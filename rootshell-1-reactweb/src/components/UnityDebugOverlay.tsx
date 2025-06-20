@@ -7,7 +7,7 @@ interface LogEntry {
 }
 
 const isDebugUIEnabled = true;
-const debugOverlayVersion = '1006'; // 버전 하드코딩
+const debugOverlayVersion = '1008'; // 버전 하드코딩
 const filterLogText = 'RootShell';
 
 
@@ -29,7 +29,7 @@ export default function UnityDebugOverlay() {
     }
   };
 
-  
+
     console.log = (...args) => {
       addLog('log', ...args);
       originalLog(...args);
