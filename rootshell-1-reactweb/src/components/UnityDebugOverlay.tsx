@@ -6,8 +6,10 @@ interface LogEntry {
   message: string;
 }
 
-const isDebugUIEnabled = false;
-const debugOverlayVersion = '1002'; // 버전 하드코딩
+const isDebugUIEnabled = true;
+const debugOverlayVersion = '1006'; // 버전 하드코딩
+const filterLogText = 'RootShell';
+
 
 export default function UnityDebugOverlay() {
   if (!isDebugUIEnabled) return null;
@@ -20,16 +22,24 @@ export default function UnityDebugOverlay() {
     const originalWarn = console.warn;
     const originalError = console.error;
 
+      const addLog = (type: LogEntry['type'], ...args: any[]) => {
+    const message = args.join(' ');
+    if (message.includes(filterLogText)) {
+      setLogs((prev) => [...prev.slice(-50), { type, message }]);
+    }
+  };
+
+  
     console.log = (...args) => {
-      setLogs((prev) => [...prev.slice(-50), { type: 'log', message: args.join(' ') }]);
+      addLog('log', ...args);
       originalLog(...args);
     };
     console.warn = (...args) => {
-      setLogs((prev) => [...prev.slice(-50), { type: 'warn', message: args.join(' ') }]);
+      addLog('warn', ...args);
       originalWarn(...args);
     };
     console.error = (...args) => {
-      setLogs((prev) => [...prev.slice(-50), { type: 'error', message: args.join(' ') }]);
+      addLog('error', ...args);
       originalError(...args);
     };
 
@@ -42,25 +52,25 @@ export default function UnityDebugOverlay() {
 
   return (
     <>
-      <button
-        onClick={() => setVisible(!visible)}
+        <button
+        onClick={() => setLogs([])} // <-- 로그 비우기 기능!
         style={{
-          position: 'fixed',
-          top: '54%',
-          left: '10%',
-          transform: 'translateX(-50%)',
-          background: '#222',
-          color: 'white',
-          padding: '10px 20px',
-          fontSize: '16px',
-          borderRadius: '8px',
-          zIndex: 10000,
-          border: '2px solid white',
-          cursor: 'pointer',
+            position: 'fixed',
+            top: '1%',
+            left: '12%',
+            transform: 'translateX(-50%)',
+            background: '#222',
+            color: 'white',
+            padding: '10px 20px',
+            fontSize: '16px',
+            borderRadius: '8px',
+            zIndex: 10000,
+            border: '2px solid white',
+            cursor: 'pointer',
         }}
-      >
-        {visible ? 'Hide Logs' : 'Show Logs'}
-      </button>
+        >
+        {'Clear All Logs'}
+        </button>
 
       <div
         style={{
