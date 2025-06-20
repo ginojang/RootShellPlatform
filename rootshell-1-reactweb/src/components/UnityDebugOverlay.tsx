@@ -7,7 +7,7 @@ interface LogEntry {
 }
 
 const isDebugUIEnabled = false;
-const debugOverlayVersion = '1000'; // 버전 하드코딩
+const debugOverlayVersion = '1002'; // 버전 하드코딩
 
 export default function UnityDebugOverlay() {
   if (!isDebugUIEnabled) return null;

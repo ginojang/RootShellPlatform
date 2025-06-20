@@ -4,9 +4,9 @@ import { KaiaWalletProvider, useKaiaWallet } from './context/KaiaContext'
 import { UnityProvider } from './context/UnityContext'
 import { UnityWrapper } from './bridge/UnityWrapper'
 import UnityDebugOverlay from './components/UnityDebugOverlay'
-import KaiaLoginView from './pages/KaiaLoginView'
+//import KaiaLoginView from './pages/KaiaLoginView'
 
-import TopLeftMenuButton from './components/TopLeftMenuButton'
+//import TopLeftMenuButton from './components/TopLeftMenuButton'
 import MaintenancePage from './pages/MaintenancePage'
 
 import WalletStatusBar from './components/WalletStatusBar'
@@ -46,27 +46,27 @@ function PaymentButton() {
 
 function AppInner() {
   const { isConnected } = useKaiaWallet()
-  const [showUnity, setShowUnity] = useState(false)
-  const [showMaintenance, setShowMaintenance] = useState(false)
+  //const [showUnity, setShowUnity] = useState(false)
+  const [showMaintenance/*, setShowMaintenance*/] = useState(false)
 
-  const toggleMaintenance = () => setShowMaintenance(prev => !prev)
-  const handleUnityStart = () => setShowUnity(true)
+  //const toggleMaintenance = () => setShowMaintenance(prev => !prev)
+  //const handleUnityStart = () => setShowUnity(true)
 
   useEffect(() => {
     console.log('🔁 상태 변경 감지됨')
     console.log('💡 isConnected:', isConnected)
-    console.log('💡 showUnity:', showUnity)
-  }, [isConnected, showUnity])
+    //console.log('💡 showUnity:', showUnity)
+  }, [isConnected/*, showUnity*/])
 
   return (
     <UnityProvider>
       <UnityDebugOverlay />
       <WalletStatusBar /> {}
-      <TopLeftMenuButton onClick={toggleMaintenance} />
+      {/*<TopLeftMenuButton onClick={toggleMaintenance} />*/}
 
       {showMaintenance ? (
         <MaintenancePage />
-      ) : isConnected && showUnity ? (
+      ) : isConnected /*&& showUnity*/ ? (
         <UnityWrapper />
       ) : (
         <>

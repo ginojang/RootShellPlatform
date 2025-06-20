@@ -1,50 +1,9 @@
-// src/pages/AStartSplash.tsx
+// AStartSplash.tsx
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useRef, useMemo } from 'react'
 import * as THREE from 'three'
 import { OrbitControls, Html } from '@react-three/drei'
-
-function HanaGlowCore() {
-  const meshRef = useRef<THREE.Mesh>(null)
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime()
-    const scale = 1 + Math.sin(t * 1.5) * 0.03
-    meshRef.current?.scale.set(scale, scale, scale)
-    meshRef.current?.rotation.set(0, t * 0.2, 0)
-  })
-
-  return (
-    <>
-      <mesh ref={meshRef} position={[0, 0, 0]}>
-        <sphereGeometry args={[1.4, 64, 64]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          emissive="#00ffff"
-          emissiveIntensity={1.2}
-          roughness={0.6}
-          metalness={0.3}
-          transparent
-          opacity={0.6} // 💠 알파 낮춤
-        />
-      </mesh>
-
-      {[2.0, 2.3, 2.6].map((r, i) => (
-        <mesh key={i} position={[0, 0, 0]}>
-          <sphereGeometry args={[r, 64, 64]} />
-          <meshBasicMaterial
-            color="#00ffff"
-            transparent
-            opacity={0.035} // 💫 더 낮게, 알파 이빠이 줌
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            side={THREE.FrontSide}
-          />
-        </mesh>
-      ))}
-    </>
-  )
-}
-
+import { useKaiaWallet } from '../context/KaiaContext' // 🔗 지갑 훅 임포트
 
 function StarParticles() {
   const particlesRef = useRef<THREE.Points>(null)
@@ -67,10 +26,7 @@ function StarParticles() {
   return (
     <points ref={particlesRef}>
       <bufferGeometry>
-<bufferAttribute
-  attach="attributes-position"
-  args={[positions, 3]} // args로 넘기면 오류 없음
-/>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
         color="#99ccff"
@@ -86,15 +42,33 @@ function StarParticles() {
 }
 
 export default function AStartSplash() {
+  const { connect } = useKaiaWallet() // 🔗 지갑 연결 함수 가져오기
+
+  const handleTouch = () => {
+    console.log('[🌸RootShell]✅ 화면 터치됨 → 지갑 연결 시도')
+    connect()
+  }
+
   return (
-    <div style={{ width: '100vw', height: '100vh', margin: 0, padding: 0, position: 'relative', overflow: 'hidden', background: 'radial-gradient(circle at center, #020c12, #000)' }}>
+    <div
+      onClick={handleTouch}
+      onTouchStart={handleTouch}
+      style={{
+        width: '100vw',
+        height: '100vh',
+        margin: 0,
+        padding: 0,
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'radial-gradient(circle at center, #020c12, #000)',
+        touchAction: 'manipulation', // 📱 모바일 터치 반응성 향상
+      }}
+    >
       <Canvas style={{ width: '100vw', height: '100vh' }} camera={{ position: [0, 0, 5] }}>
         <ambientLight intensity={0.6} />
         <pointLight position={[5, 5, 5]} intensity={1.5} color="#00ffff" />
-        {/*<HanaGlowCore />*/}
         <StarParticles />
         <OrbitControls enableZoom={false} enableRotate={false} enablePan={false} />
-
         <Html fullscreen>
           <div
             style={{
