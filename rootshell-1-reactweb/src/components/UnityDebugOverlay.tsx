@@ -6,7 +6,7 @@ interface LogEntry {
   message: string;
 }
 
-const isDebugUIEnabled = true;
+const isDebugUIEnabled = false;
 const debugOverlayVersion = '1008'; // 버전 하드코딩
 const filterLogText = 'RootShell';
 

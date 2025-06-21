@@ -7,6 +7,8 @@
   "compilerOptions": {
     "typeRoots": ["./src/types", "./node_modules/@types"],
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "jsx": "react-jsx" // 또는 "react"
   }
+  
 }

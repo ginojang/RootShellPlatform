@@ -1,14 +1,19 @@
 // src/context/KaiaContext.tsx
 import { createContext, useContext, useState } from 'react'
+import { log, logError } from '../utils/log';
+
+type ConnectionStatus = 'idle' | 'connecting' | 'connected' | 'failed'
 
 type KaiaWalletContextType = {
   address: string | null
   signature: string | null
   isConnected: boolean
-  balance: number | null         // 💰 잔액 추가
+  balance: number | null        
   connect: () => Promise<void>
-  refreshBalance: () => void   // 🔄 추가
+  refreshBalance: () => void   
+  connectionStatus: ConnectionStatus // 🔥 추가
 }
+
 
 const KaiaWalletContext = createContext<KaiaWalletContextType | undefined>(undefined)
 
@@ -18,22 +23,26 @@ export const KaiaWalletProvider = ({ children }: { children: React.ReactNode }) 
   const [isConnected, setIsConnected] = useState(false)
   const [balance, setBalance] = useState<number | null>(null)   // 💰 상태 추가
 
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('idle') // 🔥 추가
+
+
     const mockFetchBalance = () => {
     // 🔄 이 부분은 실제 API로 교체 가능
     const randomBalance = parseFloat((Math.random() * 1000).toFixed(3))
     setBalance(randomBalance)
-    console.log('[👛Wallet]🔄 잔액 리프레시됨 (Mock):', randomBalance)
+    log(`[👛Wallet]🔄 잔액 리프레시됨 (Mock): ${randomBalance}`)
   }
 
   const refreshBalance = () => {
     mockFetchBalance()
   }
 
+  /*
   const connect = async () => {
     try {
       const provider = (window as any).provider || {
         selectedAddress: '0xFAKE_WALLET_ADDRESS',
-        request: async ({ method/*, params*/ }: any) => {
+        request: async ({ method, params }: any) => {
           if (method === 'kaia_requestAccounts') return ['0xFAKE_WALLET_ADDRESS']
           if (method === 'personal_sign') return '0xFAKE_SIGNATURE'
           throw new Error(`Unsupported method: ${method}`)
@@ -55,15 +64,48 @@ export const KaiaWalletProvider = ({ children }: { children: React.ReactNode }) 
       const mockBalance = 123.456
       setBalance(mockBalance)
 
-      console.log('[👛Wallet]✅ 지갑 연결됨:', userAddress)
-      console.log('[👛Wallet]💰 잔액(MOCK):', mockBalance)
+      log(`[👛Wallet]✅ 지갑 연결됨: ${userAddress}`)
+      log(`[👛Wallet]💰 잔액(MOCK): ${mockBalance}`)
     } catch (e) {
-      console.error('[👛Wallet]❌ 지갑 연결 실패:', e)
+      logError(`[👛Wallet]❌ 지갑 연결 실패: ${e}`)
     }
   }
+  */
+  
+  const connect = async () => {
+  setConnectionStatus('connecting') // 시작
+  try {
+    const provider = (window as any).provider || {
+        selectedAddress: '0xFAKE_WALLET_ADDRESS',
+        request: async ({ method/*, params*/ }: any) => {
+        if (method === 'kaia_requestAccounts') return ['0xFAKE_WALLET_ADDRESS']
+        if (method === 'personal_sign') return '0xFAKE_SIGNATURE'
+        throw new Error(`Unsupported method: ${method}`)
+        },
+    }
+
+    const accounts = await provider.request({ method: 'kaia_requestAccounts' })
+    const userAddress = accounts[0]
+    const signed = await provider.request({
+      method: 'personal_sign',
+      params: ['Login to O2Jam Fruit', userAddress],
+    })
+
+    setAddress(userAddress)
+    setSignature(signed)
+    setIsConnected(true)
+    setBalance(123.456)
+
+    log(`[👛Wallet]✅ 지갑 연결됨: ${userAddress}`)
+    setConnectionStatus('connected') // 성공
+  } catch (e) {
+    logError(`[👛Wallet]❌ 지갑 연결 실패: ${e}`)
+    setConnectionStatus('failed') // 실패
+  }
+}
 
   return (
-    <KaiaWalletContext.Provider value={{ address, signature, isConnected, balance, connect, refreshBalance }}>
+    <KaiaWalletContext.Provider value={{ address, signature, isConnected, balance, connect, refreshBalance, connectionStatus }}>
       {children}
     </KaiaWalletContext.Provider>
   )
